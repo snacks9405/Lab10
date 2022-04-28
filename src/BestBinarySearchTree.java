@@ -7,6 +7,8 @@ import dsaj.trees.TraversalExamples;
  * probably the greatest example of a binary search tree that's ever existed
  */
 public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryTree<E> {
+    private int height;
+
     /**
      * This convenience constructor will pre-populate the tree using the array of
      * elements, inserting each one in turn, correctly, into the tree
@@ -33,8 +35,23 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
                 brokenInsert(dataToTree); //the naughty way.
             }
         }
+        height = getHeight();
     }//BestBinarySearchTree constructor
 
+    public int getHeight() {
+        if (root == null) {
+            return 0;
+        }
+        return getHeight(root, 0);
+    }
+
+    public int getHeight(Position<E> curPos, int height){
+        if (curPos == null) {
+            return height;
+        }
+        height++;
+        return Math.max(getHeight(left(curPos), height), getHeight(right(curPos), height));
+    }
     /**
      * inserts element at its correct Position, and returns that Position. If the
      * element already exists, throw an illegal state exception.
@@ -42,7 +59,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param element
      * @return
      */
-    public Position<E> insert(E element) throws IllegalStateException {
+    private Position<E> insert(E element) throws IllegalStateException {
         if (contains(element) != null) { //if the item exists in the tree, throw exception
             throw new IllegalStateException();
         }
@@ -75,7 +92,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param element
      * @return
      */
-    public Position<E> brokenInsert(E element) {
+    private Position<E> brokenInsert(E element) {
         if (root() == null) { //give it a root
             return addRoot(element);
         } else {
@@ -102,7 +119,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param curPos 
      * @return
      */
-    public boolean isBinarySearchTree(Position<E> curPos) {
+    private boolean isBinarySearchTree(Position<E> curPos) {
         Position<E> leftChild = left(curPos); //get left child or null
         Position<E> rightChild = right(curPos); //get right child or null
         if (leftChild != null) {
@@ -144,7 +161,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param curPos
      * @return
      */
-    public Position<E> contains(E element, Position<E> curPos) {
+    private Position<E> contains(E element, Position<E> curPos) {
         if (curPos.getElement().compareTo(element) == 0) { //if curPos is our element, return it
             return curPos;
         } else if (element.compareTo(curPos.getElement()) < 0) {
@@ -166,7 +183,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param element
      * @return
      */
-    public Position<E> badTreeContains(E element) {
+    private Position<E> badTreeContains(E element) {
         Position<E> walk = root; 
         while (walk != null) {
             if (element.compareTo(walk.getElement()) == 0) { //if it finds a match, return it
@@ -183,5 +200,15 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      */
     public void printTree() {
         TraversalExamples.printPreorderLabeled(this, root(), new ArrayList<Integer>());
+        System.out.println(height);
     }//printTree method
+
+    public void drawTree() {
+        int dimHeight = height * 100;
+        int dimWidth = height * 100;
+        StdDraw.setCanvasSize(dimHeight, dimWidth);
+        StdDraw.setScale(0, dimHeight);
+        StdDraw.circle(dimWidth / 2, dimWidth / 2, dimWidth / 4);
+        StdDraw.text(dimWidth/2, dimWidth/2, "poopies");
+    }
 }//BestBinarySearchTree class
