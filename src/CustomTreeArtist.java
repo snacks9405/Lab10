@@ -1,7 +1,11 @@
 import java.util.Scanner;
 
 public class CustomTreeArtist {
-    public static BestBinarySearchTree<Integer> buildInitialTree() {
+
+    public static void terminalInterface() {
+
+    }
+    private static BestBinarySearchTree<Integer> buildInitialTree() {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter initial tree: ");
         String[] input = scan.nextLine().split(", ");

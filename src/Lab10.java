@@ -10,12 +10,9 @@ learning quite a lot.
 */ 
 public class Lab10 {
     public static void main(String[] args) throws Exception {
-        BestBinarySearchTree<Integer> tree = new BestBinarySearchTree<>(new Integer[] {1, 2, 3, 4});
-        tree.printTree();
-        tree.drawTree();
-
-        //StdDraw.setCanvasSize(500, 500);
-        //StdDraw.setScale(0, 100);
-        //StdDraw.filledCircle(50, 50, 25);
+        CustomTreeArtist.terminalInterface();
+        //BestBinarySearchTree<Integer> tree = new BestBinarySearchTree<>(new Integer[] {500, 250, 580, 400});
+        //tree.printTree();
+        //tree.drawTree();
     }
 }
