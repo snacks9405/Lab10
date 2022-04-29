@@ -3,7 +3,8 @@ import java.util.Scanner;
 public class CustomTreeArtist {
 
     public static void terminalInterface() {
-
+        buildInitialTree();
+        System.out.print("");
     }
     private static BestBinarySearchTree<Integer> buildInitialTree() {
         Scanner scan = new Scanner(System.in);
