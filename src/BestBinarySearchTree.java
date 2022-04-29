@@ -37,23 +37,8 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
                 brokenInsert(dataToTree); // the naughty way.
             }
         }
-        height = getHeight();
+        setHeight();
     }// BestBinarySearchTree constructor
-
-    public int getHeight() {
-        if (root == null) {
-            return 0;
-        }
-        return getHeight(root, 0);
-    }
-
-    public int getHeight(Position<E> curPos, int height) {
-        if (curPos == null) {
-            return height;
-        }
-        height++;
-        return Math.max(getHeight(left(curPos), height), getHeight(right(curPos), height));
-    }
 
     /**
      * inserts element at its correct Position, and returns that Position. If the
@@ -62,7 +47,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param element
      * @return
      */
-    private Position<E> insert(E element) throws IllegalStateException {
+    protected Position<E> insert(E element) throws IllegalStateException {
         if (contains(element) != null) { // if the item exists in the tree, throw exception
             throw new IllegalStateException();
         }
@@ -74,6 +59,7 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
             if (element.compareTo(walk.getElement()) < 0) { // if element is less than walk...
                 if (left(walk) == null) {
                     return addLeft(walk, element); // make it the left child or...
+                    
                 } else {
                     walk = left(walk); // move on to the left child.
                 }
@@ -210,70 +196,118 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
         System.out.println(height);
     }// printTree method
 
-    public void drawTree() {
-        int drawHeight = height * 100;
-        int drawWidth =  height * 100;
-        final int RADIUS = 20;
-        StdDraw.setCanvasSize(drawWidth, drawHeight);
-        StdDraw.setScale(0, drawHeight);
-        drawTrees(1, drawHeight, drawWidth, RADIUS, new HashMap<>());
-    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //below this line are new items
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * calculates the height of the tree. (I realize it's off by one but wanted
+     * to avoid a lot of +1's later.)
+     */
+    public void setHeight() {
+        if (root == null) {
+            height = 0;
+        }
+        height = setHeight(root, 0);
+    }//setHeight method
+
+    /**
+     * recursively calculates the height of the tree.
+     * @param curPos
+     * @param height
+     * @return
+     */
+    private int setHeight(Position<E> curPos, int height) {
+        if (curPos == null) {
+            return height;
+        }
+        height++;
+        return Math.max(setHeight(left(curPos), height), setHeight(right(curPos), height)); //travels down the tree looking for the longest branch
+    }//setHeight method
+
+    /**
+     * draws the tree using stdDraw
+     */
+    public void drawTree() {
+        int drawHeight = height * 100; //easily scales the tree for the heights we're focusing on. 
+        int drawWidth =  height * 100;
+        final int RADIUS = 20; //found 20 looks nice, let's lock it in
+        StdDraw.setCanvasSize(drawWidth, drawHeight); 
+        StdDraw.setScale(0, drawHeight);
+        drawTrees(1, drawHeight, drawWidth, RADIUS, new HashMap<>()); //passes along the measurements and begins drawing the tree at the top
+    }//drawTree method
+
+    /**
+     * recursively draws the tree level by level
+     * 
+     * @param level             level being drawn
+     * @param drawHeight        height of canvas
+     * @param drawWidth         width of canvas
+     * @param radius            radius of each circle
+     * @param parentPositions   the positions and their coordinates on the stdDraw canvas
+     */
     public void drawTrees(int level, int drawHeight, int drawWidth, int radius, HashMap<Position, double[]> parentPositions) {
-        double nodeMaxOnLevel = Math.pow(2, level - 1);
-        double numberSplitsOnAxis = nodeMaxOnLevel + 1;
-        double yPosition = drawHeight - (level * (drawHeight / (height + 1)));
-        ArrayList<Position> nodesAtLevel = getNodesAtHeight(level);
-        HashMap<Position, double[]> curPositions = new HashMap<>();
-        for (int i = 0; i < nodeMaxOnLevel; i++) {
-            
+        double nodeMaxOnLevel = Math.pow(2, level - 1); //helps determine the amount...
+        double numberSplitsOnAxis = nodeMaxOnLevel + 1;    //of splits on the x axis we need to make enough space.
+        double yPosition = drawHeight - (level * (drawHeight / (height + 1))); //splits the y plane into (height+1) spaces and selects the one we should be on
+        ArrayList<Position> nodesAtLevel = getNodesAtHeight(level); //uses helper method to get all of the nodes at the current level
+        HashMap<Position, double[]> curPositions = new HashMap<>(); //prepares a hashmap to store these nodes and their coordinates to draw lines to in the next level
+        for (int i = 0; i < nodeMaxOnLevel; i++) { //iterates through the nodes at this level and plots them...
             Position curNode = nodesAtLevel.get(i);
             if (curNode != null) {
                 double xPosition = drawWidth / numberSplitsOnAxis + (i * (drawWidth / numberSplitsOnAxis));
                 StdDraw.circle(xPosition, yPosition, 20);
                 StdDraw.text(xPosition, yPosition, curNode.getElement().toString());
                 double[] xyVals = {xPosition, yPosition};
-                curPositions.put(curNode, xyVals);
+                curPositions.put(curNode, xyVals); //and stores them for the next level down. 
                 if (curNode != root) {
-                    double[] parentData = parentPositions.get(parent(curNode));
-                    StdDraw.line(xPosition, yPosition + 20, parentData[0], parentData[1]-20);
+                    double[] parentData = parentPositions.get(parent(curNode)); //to draw a line, start at the current node, find its parent in the hashmap...
+                    StdDraw.line(xPosition, yPosition + 20, parentData[0], parentData[1]-20); //and finish at the parents coordinates. 
                 }
             }
         }
-        if (level != height) {
+        if (level != height) { //continue drawing until we've done the whole thing.
             drawTrees(++level, drawHeight, drawWidth, radius, curPositions);
         }
-    }
+    }//drawTrees method
 
-
-    public ArrayList<Position> getNodesAtHeight(int heightToSearch) {
-        ArrayList<Position> elementList = new ArrayList<>();
-        if (heightToSearch == 1) {
-            elementList.add(root);
+    /**
+     * returns an arrayList containing all of the nodes at the specified height
+     * 
+     * @param levelToSearch
+     * @return
+     */
+    public ArrayList<Position> getNodesAtHeight(int levelToSearch) {
+        ArrayList<Position> nodeSet = new ArrayList<>();
+        if (levelToSearch == 1) {
+            nodeSet.add(root); //easy level one only has the root
         } else {
-            ArrayList<Position> nodeSet = new ArrayList<>();
-            nodeSet.add(root);
-            nodeSet = getNodesAtHeight(heightToSearch, 2, nodeSet);
-            for (Position p : nodeSet) {
-                if (p == null) {
-                    elementList.add(null);
-                } else {
-                    elementList.add(p);
-                }
-            }
+            nodeSet.add(root); //pass the root in and search the next
+            nodeSet = getNodesAtHeight(levelToSearch, 2, nodeSet);//set height to search as 2 as it's the one after root.
         }
-        return elementList;
-    }
+        return nodeSet;
+    }//getNodesAtHeight method
 
-    public ArrayList<Position> getNodesAtHeight(int height, int currentHeight, ArrayList<Position> nodeSet) {
+    /**
+     * recursively grabs the nodes at the specified level by going down 1-1 and getting all of the children. then
+     * their children etc etc.
+     * 
+     * @param levelToSearch  target level
+     * @param currentLevel  current level
+     * @param nodeSet the parents of the current level
+     * @return the nodes at the current level
+     */
+    public ArrayList<Position> getNodesAtHeight(int levelToSearch, int currentLevel, ArrayList<Position> nodeSet) {
         ArrayList<Position> nodesAtCurrentHeight = new ArrayList<>();
-        for (Position curPos : nodeSet) {
+        for (Position curPos : nodeSet) { //iterate through the parents of the current level
             Position leftChild = (curPos == null ? null : left(curPos));
             Position rightChild = (curPos == null ? null : right(curPos));
             if (leftChild == null) {
-                nodesAtCurrentHeight.add(null);
+                nodesAtCurrentHeight.add(null); //preserve empty spaces
             } else {
-                nodesAtCurrentHeight.add(leftChild);
+                nodesAtCurrentHeight.add(leftChild); //or pass in actual nodes
             }
             if (rightChild == null) {
                 nodesAtCurrentHeight.add(null);
@@ -281,11 +315,10 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
                 nodesAtCurrentHeight.add(rightChild);
             }
         }
-        if (height == currentHeight) {
+        if (levelToSearch == currentLevel) { //if this was the level target, send em out.
             return nodesAtCurrentHeight;
         }
 
-        return getNodesAtHeight(height, ++currentHeight, nodesAtCurrentHeight);
-    }
-
+        return getNodesAtHeight(levelToSearch, ++currentLevel, nodesAtCurrentHeight); //if we haven't gone far enough down, keep digging.
+    }//getNodesAtHeight method
 }// BestBinarySearchTree class
