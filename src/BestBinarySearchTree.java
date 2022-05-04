@@ -248,14 +248,14 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param radius            radius of each circle
      * @param parentPositions   the positions and their coordinates on the stdDraw canvas
      */
-    public void drawTrees(int level, int drawHeight, int drawWidth, int radius, HashMap<Position, double[]> parentPositions) {
+    public void drawTrees(int level, int drawHeight, int drawWidth, int radius, HashMap<Position<E>, double[]> parentPositions) {
         double nodeMaxOnLevel = Math.pow(2, level - 1); //helps determine the amount...
         double numberSplitsOnAxis = nodeMaxOnLevel + 1;    //of splits on the x axis we need to make enough space.
         double yPosition = drawHeight - (level * (drawHeight / (height + 1))); //splits the y plane into (height+1) spaces and selects the one we should be on
-        ArrayList<Position> nodesAtLevel = getNodesAtHeight(level); //uses helper method to get all of the nodes at the current level
-        HashMap<Position, double[]> curPositions = new HashMap<>(); //prepares a hashmap to store these nodes and their coordinates to draw lines to in the next level
+        ArrayList<Position<E>> nodesAtLevel = getNodesAtHeight(level); //uses helper method to get all of the nodes at the current level
+        HashMap<Position<E>, double[]> curPositions = new HashMap<>(); //prepares a hashmap to store these nodes and their coordinates to draw lines to in the next level
         for (int i = 0; i < nodeMaxOnLevel; i++) { //iterates through the nodes at this level and plots them...
-            Position curNode = nodesAtLevel.get(i);
+            Position<E> curNode = nodesAtLevel.get(i);
             if (curNode != null) {
                 double xPosition = drawWidth / numberSplitsOnAxis + (i * (drawWidth / numberSplitsOnAxis));
                 StdDraw.circle(xPosition, yPosition, 20);
@@ -279,8 +279,8 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param levelToSearch
      * @return
      */
-    public ArrayList<Position> getNodesAtHeight(int levelToSearch) {
-        ArrayList<Position> nodeSet = new ArrayList<>();
+    public ArrayList<Position<E>> getNodesAtHeight(int levelToSearch) {
+        ArrayList<Position<E>> nodeSet = new ArrayList<>();
         if (levelToSearch == 1) {
             nodeSet.add(root); //easy level one only has the root
         } else {
@@ -299,11 +299,11 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
      * @param nodeSet the parents of the current level
      * @return the nodes at the current level
      */
-    public ArrayList<Position> getNodesAtHeight(int levelToSearch, int currentLevel, ArrayList<Position> nodeSet) {
-        ArrayList<Position> nodesAtCurrentHeight = new ArrayList<>();
-        for (Position curPos : nodeSet) { //iterate through the parents of the current level
-            Position leftChild = (curPos == null ? null : left(curPos));
-            Position rightChild = (curPos == null ? null : right(curPos));
+    public ArrayList<Position<E>> getNodesAtHeight(int levelToSearch, int currentLevel, ArrayList<Position<E>> nodeSet) {
+        ArrayList<Position<E>> nodesAtCurrentHeight = new ArrayList<>();
+        for (Position<E> curPos : nodeSet) { //iterate through the parents of the current level
+            Position<E> leftChild = (curPos == null ? null : left(curPos));
+            Position<E> rightChild = (curPos == null ? null : right(curPos));
             if (leftChild == null) {
                 nodesAtCurrentHeight.add(null); //preserve empty spaces
             } else {
