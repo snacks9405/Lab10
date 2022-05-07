@@ -258,13 +258,16 @@ public class BestBinarySearchTree<E extends Comparable<E>> extends LinkedBinaryT
             Position<E> curNode = nodesAtLevel.get(i);
             if (curNode != null) {
                 double xPosition = drawWidth / numberSplitsOnAxis + (i * (drawWidth / numberSplitsOnAxis));
-                StdDraw.circle(xPosition, yPosition, 20);
+                StdDraw.setPenColor(StdDraw.WHITE);
+                StdDraw.filledCircle(xPosition, yPosition, radius);
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.circle(xPosition, yPosition, radius);
                 StdDraw.text(xPosition, yPosition, curNode.getElement().toString());
                 double[] xyVals = {xPosition, yPosition};
                 curPositions.put(curNode, xyVals); //and stores them for the next level down. 
                 if (curNode != root) {
                     double[] parentData = parentPositions.get(parent(curNode)); //to draw a line, start at the current node, find its parent in the hashmap...
-                    StdDraw.line(xPosition, yPosition + 20, parentData[0], parentData[1]-20); //and finish at the parents coordinates. 
+                    StdDraw.line(xPosition, yPosition, parentData[0], parentData[1]); //and finish at the parents coordinates. 
                 }
             }
         }
